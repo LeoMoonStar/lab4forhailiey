@@ -1,0 +1,182 @@
+// Project4.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include<fstream>
+#include <string>
+#include<sstream>
+#include<iomanip>
+#include<stdio.h>
+
+
+using namespace std;
+
+void printIndent(int bracketCount) {
+	for (int i = 0; i < bracketCount; i++)
+		cout << ' ';
+}
+bool theLastBracket(string a, int indice) {
+	indice = indice + 1;
+	while (a[indice] != '\0')
+	{
+		if ((a[indice] != ' '))
+		{
+			return false;
+		}
+
+		else
+		{
+			indice++;
+		}
+
+	}
+	return true;
+}
+
+
+
+bool nothingUntile2ndBrackets(string a, int indice) {
+
+	indice = indice + 1;
+	while (a[indice] != '}')
+	{
+		if ((a[indice] != '\n') && (a[indice] != ' '))
+		{
+			return false;
+		}
+
+		else
+		{
+			indice++;
+		}
+
+	}
+	return true;
+}
+
+
+
+void prettyPrint(string a, int length) {
+	int indice = 0, bracketCount = 0;
+	bool newLinePrinted;
+
+	while (a[indice] == ' ') /*requirement 1, and make sure the string will be printed from the
+							 first word*/
+	{
+		indice++;
+	}
+
+	while (indice <= length)// string starts to be printed
+	{
+		if (a[indice] == ' '||a[indice]=='\n')// skip all the whitespaces and new line
+		{
+			indice++;
+		}
+		else
+		{
+
+			if (a[indice] == ';') //requirement 2
+			{
+				cout << a[indice];
+				cout << '\n';
+				newLinePrinted = true;
+				if (nothingUntile2ndBrackets(a, indice) == false)
+				{
+					printIndent(bracketCount);
+					
+				}
+				indice++;
+			}
+			else if (a[indice] == '{') //requirement 3
+			{
+				bracketCount = bracketCount + 1;
+				cout << a[indice];
+				cout << '\n';
+				newLinePrinted = true;
+				if (nothingUntile2ndBrackets(a, indice) == false)
+				{
+					printIndent(bracketCount);
+					
+				}
+				indice++;
+			}
+			else if (a[indice] == '}') //requirement 4
+			{
+				bracketCount = bracketCount - 1;
+				if (newLinePrinted == false)
+				{
+					cout << '\n';
+					newLinePrinted = true;
+				}
+				
+				cout << a[indice];
+				if (theLastBracket(a, indice) == false)
+				{
+					cout << '\n';
+					printIndent(bracketCount);
+				}
+
+				newLinePrinted = true;
+				indice++;
+			}
+			else if ((a[indice] == '/') && (a[indice+1] == '/')) // requirement 5
+			{
+				do {
+					cout << a[indice];
+					indice = indice + 1;
+				} while (a[indice] != '\n'&&a[indice]!='\0');
+				cout << '\n';
+				printIndent(bracketCount);
+
+			}
+			else
+			{
+				//printIndent(bracketCount);
+				newLinePrinted = false;
+				while ((a[indice] != ' ') && (indice < length))
+				{
+					cout << a[indice];
+					indice++;
+				}
+				cout << ' ';
+				indice++;
+			}
+
+		}
+	}
+
+}
+
+
+int main()
+{
+	int length;
+	string sourceCode, inputCode = "1";
+	while (inputCode.length() != 0) {
+		getline(cin, inputCode);
+		sourceCode.append(inputCode);
+		sourceCode.append("\n");
+	}
+	sourceCode.erase(sourceCode.end() - 1);
+	sourceCode.erase(sourceCode.end() - 1);
+	length = sourceCode.length();
+
+	prettyPrint(sourceCode, length);
+	/*cout << sourceCode;
+	for (int i = 0; i < length; i++)
+	{
+		if (sourceCode[i] == '\n')
+			cout << 'E';
+		else if(sourceCode[i]==' ')
+		{
+			cout << 'S';
+		}
+		cout << sourceCode[i] << endl;
+
+	}
+	cout << sourceCode[length];*/
+	cout << '\n';
+	cout << "length is " << length << endl;
+	return 0;
+}

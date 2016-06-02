@@ -1,0 +1,243 @@
+// Project4.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include<fstream>
+#include <string>
+#include<sstream>
+#include<iomanip>
+#include<stdio.h>
+#include<cstdlib>
+
+
+
+
+using namespace std;
+
+int realStart(string a) {
+	int indice = 0;
+	while (a[indice] == ' ' || a[indice] == '\n') {
+		indice++;
+	}
+	return indice;
+}
+
+void printIndent(int bracketCount) {
+	for (int i = 0; i < bracketCount; i++)
+		cout << ' ';
+}
+
+bool theLastBracket(string a, int indice) {
+	indice = indice + 1;
+	while (a[indice] != '\0')
+	{
+		if ((a[indice] != ' '))
+		{
+			return false;
+		}
+
+		else
+		{
+			indice++;
+		}
+
+	}
+	return true;
+}
+
+bool rightSequence(string a, int indice) {
+	indice = indice + 1;
+	if ((a[indice] == ' ') || (a[indice] == '\n') || (indice == a.length()))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool lastSpecialToken(string a, int indice) {
+	if (indice == a.length()-1)
+		return true;
+	return false;
+}
+
+bool nothingUntile2ndBrackets(string a, int indice) {
+
+	indice = indice + 1;
+	while (a[indice] != '}')
+	{
+		if ((a[indice] != '\n') && (a[indice] != ' '))
+		{
+			return false;
+		}
+
+		else
+		{
+			indice++;
+		}
+
+	}
+	return true;
+}
+
+//we say that every new line should be decided by last character
+
+// but ident should be made by its self
+
+void prettyPrint(string a, int length) {
+	int indice = realStart(a);
+	int bracketCount = 0;
+	bool emptyLine = true;
+
+	while (indice < length)//big loop for the whole string
+	{
+		if (a[indice] == ' ')
+			indice++;
+		else if ((a[indice] == '\n') && (emptyLine == false)) {// which means the string goes to the next line
+			cout << '\n';
+			emptyLine = true;
+			indice++;
+		}
+		else if ((a[indice] == '\n') && (emptyLine == true)) {
+			indice++;
+		}
+		else if ((a[indice] == ';') && (rightSequence(a, indice)))
+		{
+			if (emptyLine == true) {
+				printIndent(bracketCount);
+				cout << a[indice];
+				if(lastSpecialToken(a,indice)==false)
+				cout << '\n';
+			}
+			else
+			{
+				cout << a[indice];
+				if (lastSpecialToken(a, indice) == false)
+				{
+					cout << '\n';
+					emptyLine = true;
+				}
+			}
+			indice++;
+		}
+		else if ((a[indice] == '{') && (rightSequence(a, indice))) {
+			if (emptyLine == true) {
+				printIndent(bracketCount);
+				cout << a[indice];
+				cout << '\n';
+			}
+			else
+			{
+				cout << a[indice];
+				cout << '\n';
+				emptyLine = true;
+			}
+			bracketCount++;
+			indice++;
+		}
+		else if ((a[indice] == '}') && (rightSequence(a, indice))) {
+			bracketCount--;
+			if (emptyLine == true) {
+				printIndent(bracketCount);
+				cout << a[indice];
+				if (lastSpecialToken(a, indice) == false)
+				cout << '\n';
+			}
+			else
+			{
+				cout << '\n';
+				printIndent(bracketCount);
+				cout << a[indice];
+				if (lastSpecialToken(a, indice) == false) {
+					cout << '\n';
+					emptyLine = true;
+				}
+			}
+			indice++;
+		}
+		else if ((a[indice] == '/') && (a[indice + 1] == '/') && (rightSequence(a, indice + 1))) {
+			if (emptyLine == false)
+			{
+				while (a[indice] != '\n')
+				{
+					cout << a[indice];
+					indice++;
+				}
+
+			}
+			else
+			{
+				printIndent(bracketCount);
+				while ((a[indice] != '\n') && indice < length)
+				{
+					cout << a[indice];
+					indice++;
+				}
+				emptyLine = false;
+			}
+			indice++;
+		}
+		else {
+			if (emptyLine == false)
+			{
+				while ((a[indice] != ' ') && (a[indice] != '\n') && (indice < length))
+				{
+					cout << a[indice];
+					indice++;
+				}
+				if (a[indice] == ' ')
+					cout << ' ';
+
+			}
+			else
+			{
+				printIndent(bracketCount);
+				while ((a[indice] != ' ') && (a[indice] != '\n') && (indice < length))
+				{
+					cout << a[indice];
+					indice++;
+				}
+				if (a[indice] == ' ')
+					cout << ' ';
+				emptyLine = false;
+			}
+
+		}
+
+	}
+
+}
+
+
+
+int main()
+{
+	int length;
+	string sourceCode, inputCode = "1";
+	while (inputCode.length() != 0) {
+		getline(cin, inputCode);
+		sourceCode.append(inputCode);
+		sourceCode.append("\n");
+	}
+	sourceCode.erase(sourceCode.end() - 1);
+	sourceCode.erase(sourceCode.end() - 1);
+	length = sourceCode.length();
+
+	prettyPrint(sourceCode, length);
+	/*cout << sourceCode;
+	for (int i = 0; i < length; i++)
+	{
+		if (sourceCode[i] == '\n')
+			cout << 'E';
+		else if(sourceCode[i]==' ')
+		{
+			cout << 'S';
+		}
+		cout << sourceCode[i] << endl;
+
+	}
+	cout << sourceCode[length];*/
+	cout << '\n';
+	cout << "length is " << length << endl;
+	return 0;
+}
